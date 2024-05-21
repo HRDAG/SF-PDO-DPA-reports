@@ -1,0 +1,145 @@
+2023-08-07 23:49:11 - INFO - done.
+2023-08-07 23:59:54 - INFO - done.
+2023-08-08 00:02:31 - INFO - done.
+2023-08-08 00:05:07 - INFO - done.
+2023-08-08 00:14:33 - INFO - initial shape:	27977
+2023-08-08 00:14:33 - INFO - after filtering OOB:	25583
+2023-08-08 00:14:41 - INFO - done.
+2023-08-08 00:26:32 - INFO - initial shape:	27977
+2023-08-08 00:26:32 - INFO - after filtering OOB:	25583
+2023-08-08 00:29:23 - INFO - initial shape:	27977
+2023-08-08 00:29:23 - INFO - after filtering OOB:	25583
+2023-08-08 00:29:57 - INFO - initial shape:	27977
+2023-08-08 00:29:57 - INFO - after filtering OOB:	25583
+2023-08-08 00:31:27 - INFO - initial shape:	27977
+2023-08-08 00:31:27 - INFO - after filtering OOB:	25583
+2023-08-08 00:31:35 - INFO - done.
+2023-08-08 00:33:00 - INFO - initial shape:	27977
+2023-08-08 00:33:00 - INFO - after filtering OOB:	25583
+2023-08-08 00:33:08 - INFO - done.
+2023-08-08 00:56:04 - INFO - initial shape:	27977
+2023-08-08 00:56:04 - INFO - after filtering OOB:	25583
+2023-08-08 00:56:12 - INFO - done.
+2023-08-08 01:12:00 - INFO - initial shape:	27977
+2023-08-08 01:12:00 - INFO - after filtering OOB:	25583
+2023-08-08 01:12:09 - INFO - done.
+2023-08-08 01:36:13 - INFO - initial shape:	27977
+2023-08-08 01:36:13 - INFO - after filtering OOB:	25583
+2023-08-08 01:36:21 - INFO - done.
+2023-08-09 20:39:11 - INFO - initial shape:	27954
+2023-08-09 20:39:11 - INFO - after filtering OOB:	25560
+2023-08-09 20:39:19 - INFO - done.
+2023-08-09 20:39:52 - INFO - initial shape:	27954
+2023-08-09 20:39:52 - INFO - after filtering OOB:	25560
+2023-08-09 20:40:00 - INFO - done.
+2023-08-09 20:50:08 - INFO - initial shape:	27954
+2023-08-09 20:50:08 - INFO - after filtering OOB:	25560
+2023-08-09 20:50:17 - INFO - done.
+2023-08-09 20:58:15 - INFO - initial shape:	27954
+2023-08-09 20:58:15 - INFO - after filtering OOB:	25560
+2023-08-09 20:58:24 - INFO - done.
+2023-08-09 21:04:17 - INFO - initial shape:	27930
+2023-08-09 21:04:17 - INFO - after filtering OOB:	25536
+2023-08-09 21:04:26 - INFO - done.
+2023-08-09 21:11:04 - INFO - initial shape:	27930
+2023-08-09 21:11:04 - INFO - after filtering OOB:	25536
+2023-08-09 21:11:12 - INFO - done.
+2023-08-09 21:18:38 - INFO - initial shape:	27930
+2023-08-09 21:18:38 - INFO - after filtering OOB:	25536
+2023-08-09 21:18:46 - INFO - done.
+2023-08-09 21:21:58 - INFO - initial shape:	27930
+2023-08-09 21:21:58 - INFO - after filtering OOB:	25536
+2023-08-09 21:22:06 - INFO - done.
+2023-08-09 21:23:04 - INFO - initial shape:	27930
+2023-08-09 21:23:04 - INFO - after filtering OOB:	25536
+2023-08-09 21:23:12 - INFO - done.
+2023-08-10 09:27:18 - INFO - initial shape:	27930
+2023-08-10 09:36:46 - INFO - initial shape:	27930
+2023-08-10 09:36:46 - INFO - after filtering OOB:	25536
+2023-08-10 09:39:54 - INFO - initial shape:	27930
+2023-08-10 09:39:54 - INFO - after filtering OOB:	25536
+2023-08-10 09:40:15 - INFO - initial shape:	27930
+2023-08-10 09:40:15 - INFO - after filtering OOB:	25536
+2023-08-10 09:40:26 - INFO - done.
+2023-08-10 09:42:05 - INFO - initial shape:	27930
+2023-08-10 09:42:05 - INFO - after filtering OOB:	25536
+2023-08-10 09:42:16 - INFO - initial shape:	27930
+2023-08-10 09:42:16 - INFO - after filtering OOB:	25536
+2023-08-10 09:42:27 - INFO - done.
+2023-08-10 10:02:04 - INFO - initial shape:	27930
+2023-08-10 10:02:04 - INFO - after filtering OOB:	25536
+2023-08-10 10:02:15 - INFO - done.
+2023-08-10 10:06:30 - INFO - initial shape:	27930
+2023-08-10 10:06:30 - INFO - after filtering OOB:	25536
+2023-08-10 10:06:39 - INFO - done.
+2023-08-10 10:15:06 - INFO - initial shape:	27930
+2023-08-10 10:15:06 - INFO - after filtering OOB:	25536
+2023-08-10 10:15:15 - INFO - done.
+2023-08-10 10:18:21 - INFO - initial shape:	27930
+2023-08-10 10:18:21 - INFO - after filtering OOB:	25536
+2023-08-10 10:18:31 - INFO - done.
+2023-08-10 10:26:17 - INFO - initial shape:	26866
+2023-08-10 10:26:17 - INFO - after filtering OOB:	24477
+2023-08-10 10:26:26 - INFO - done.
+2023-08-10 10:26:54 - INFO - initial shape:	26866
+2023-08-10 10:26:54 - INFO - after filtering OOB:	24477
+2023-08-10 10:27:03 - INFO - done.
+2023-08-10 10:27:59 - INFO - initial shape:	26866
+2023-08-10 10:27:59 - INFO - after filtering OOB:	24477
+2023-08-10 10:28:08 - INFO - done.
+2023-08-10 10:35:50 - INFO - initial shape:	26866
+2023-08-10 10:35:50 - INFO - after filtering OOB:	24477
+2023-08-10 10:35:59 - INFO - done.
+2023-08-10 10:41:03 - INFO - initial shape:	26866
+2023-08-10 10:41:03 - INFO - after filtering OOB:	24477
+2023-08-10 10:41:13 - INFO - done.
+2023-08-10 10:44:04 - INFO - initial shape:	26866
+2023-08-10 10:44:04 - INFO - after filtering OOB:	24477
+2023-08-10 10:44:14 - INFO - done.
+2023-08-10 10:53:04 - INFO - initial shape:	26866
+2023-08-10 10:53:04 - INFO - after filtering OOB:	24477
+2023-08-10 10:53:14 - INFO - done.
+2023-08-10 20:55:14 - INFO - initial shape:	26740
+2023-08-10 20:55:14 - INFO - after filtering OOB:	24414
+2023-08-10 20:55:24 - INFO - done.
+2023-08-31 14:22:14 - INFO - initial shape:	26740
+2023-08-31 14:22:14 - INFO - after filtering OOB:	24414
+2023-08-31 15:00:19 - INFO - initial shape:	26011
+2023-08-31 15:00:19 - INFO - after filtering OOB:	23847
+2023-09-07 09:27:22 - INFO - initial shape:	26011
+2023-09-07 09:27:22 - INFO - after filtering OOB:	23847
+2023-09-07 16:24:08 - INFO - initial shape:	26011
+2023-09-07 16:24:08 - INFO - after filtering OOB:	23847
+2023-09-07 16:43:14 - INFO - initial shape:	26011
+2023-09-07 16:43:14 - INFO - after filtering OOB:	23847
+2023-09-07 16:46:15 - INFO - initial shape:	26011
+2023-09-07 16:46:15 - INFO - after filtering OOB:	23847
+2023-09-07 16:47:28 - INFO - initial shape:	26011
+2023-09-07 16:47:28 - INFO - after filtering OOB:	23847
+2023-09-07 16:50:33 - INFO - initial shape:	26011
+2023-09-07 16:50:33 - INFO - after filtering OOB:	23847
+2023-09-07 16:50:45 - INFO - done.
+2023-09-07 17:03:12 - INFO - initial shape:	26011
+2023-09-07 17:03:12 - INFO - after filtering OOB:	23847
+2023-09-07 17:03:23 - INFO - done.
+2023-09-07 18:12:30 - INFO - initial shape:	26991
+2023-09-07 18:12:30 - INFO - after filtering OOB:	24823
+2023-09-07 18:12:42 - INFO - done.
+2023-09-21 11:36:57 - INFO - initial shape:	27038
+2023-09-21 11:36:57 - INFO - after filtering OOB:	24863
+2023-09-21 11:37:09 - INFO - done.
+2023-09-21 11:49:37 - INFO - initial shape:	27038
+2023-09-21 11:49:37 - INFO - after filtering OOB:	24863
+2023-09-21 11:49:50 - INFO - done.
+2023-11-02 11:23:09 - INFO - initial shape:	27228
+2023-11-02 11:23:09 - INFO - after filtering OOB:	24997
+2023-11-02 11:23:22 - INFO - done.
+2024-01-11 10:31:15 - INFO - initial shape:	27228
+2024-01-11 10:31:15 - INFO - after filtering OOB:	24997
+2024-01-11 10:31:26 - INFO - done.
+2024-01-11 11:06:24 - INFO - initial shape:	27565
+2024-01-11 11:06:24 - INFO - after filtering OOB:	25299
+2024-01-11 11:06:36 - INFO - done.
+2024-05-20 13:54:37 - INFO - initial shape:	27626
+2024-05-20 13:54:37 - INFO - after filtering OOB:	25327
+2024-05-20 13:54:52 - INFO - done.
