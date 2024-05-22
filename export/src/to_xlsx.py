@@ -14,8 +14,7 @@ from pathlib import Path
 from sys import stdout
 import argparse
 import logging
-import re
-import yaml
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 import pandas as pd
 #}}}
 
@@ -42,12 +41,6 @@ def get_logger(sname, file_name=None):
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
     return logger
-
-
-def read_yaml(fname):
-    with open(fname, 'r') as f_handle:
-        out = yaml.safe_load(f_handle)
-    return out
 
 
 def get_notes():
@@ -77,15 +70,21 @@ def get_real_cols():
 
 
 def get_kw_cols():
-    return [ \
-            'allegation_id',\
-            'named_officers', 'no_officer_id',\
-            'default_finding', 'jlp',\
-            'resisting', 'force', 'bwc', \
-            'intimidation', 'racial_bias', \
-            'pursuit', 'swat', 'firearm', 'taser', \
-            'home', 'minor', 'crisis', 'missing_person', \
-            'pdf_url'
+    return [
+        'allegation_id',
+        'named_officers', 'no_officer_id',
+        'default_finding', 'jlp',
+        'resisting', 'force', 'bwc',
+        'intimidation', 'racial_bias',
+        'pursuit', 'swat', 'firearm', 'taser',
+        'home', 'minor', 'crisis', 'missing_person',
+        'action_wo_cause',
+        'entry_wo_cause', 'search_wo_cause', 'towed_wo_cause', 'tookproperty_wo_cause',
+        'cite_wo_cause', 'detain_wo_cause', 'arrest_wo_cause',
+        'display_weapon', 'unnec_force', 'malignant_action',
+        'dishonesty', 'bias',
+        'inapp_action', 'malignant_action', 'failed_reqmt',
+        'pdf_url'
     ]
 #}}}
 
@@ -97,10 +96,14 @@ if __name__ == '__main__':
     # arg handling
     args = get_args()
     complaints = pd.read_parquet(args.input)
-    initial = complaints.shape[0]
+
     logger.info(f'initial shape:\t{complaints.shape[0]}')
     complaints = complaints.loc[complaints.outside_jurisdiction == False]
-    logger.info(f'after filtering OOB:\t{complaints.shape[0]}')
+    # remove illegal characters prior to exporting to excel
+    complaints = complaints.map(
+        lambda x: ILLEGAL_CHARACTERS_RE.sub(r'', x) if isinstance(x, str) else x)
+    logger.info(f'after filtering out complaints outside the jurisdiction of the DPA:\t{complaints.shape[0]}')
+
     sustained = complaints.loc[complaints.sustained == 1]
     added = complaints.loc[(complaints.dpa_added) | (complaints.occ_added)]
     mediated = complaints.loc[complaints.mediation_status.notna()]
@@ -117,8 +120,8 @@ if __name__ == '__main__':
         complaints[kws].to_excel(writer, sheet_name='keywords')
         notes.to_excel(writer, sheet_name='notes')
     complaints.to_parquet("output/complaints.parquet")
-    
+
     logger.info("done.")
-    
+
 #}}}
 # done.

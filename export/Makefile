@@ -7,7 +7,7 @@
 # SFO-pubdef-documents/individual/DPA/export/Makefile
 
 # ---- dependencies {{{
-complaints := ../clean/output/complaints.parquet
+complaints := ../indicate/output/complaints.parquet
 output := output/complaints.xlsx
 # }}}
 
@@ -16,7 +16,7 @@ output := output/complaints.xlsx
 
 all: $(output)
 
-clean: 
+clean:
 	-rm -r output/*
 # }}}
 
@@ -29,5 +29,5 @@ $(output): \
 		--input=$(complaints) \
 		--output=$@
 # }}}
- 
+
 # done.
