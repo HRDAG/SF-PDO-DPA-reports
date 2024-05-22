@@ -9,9 +9,10 @@
 # dependencies {{{
 from pathlib import Path
 from sys import stdout
+import time
 import argparse
 import logging
-from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+import re
 import pandas as pd
 # }}}
 
@@ -41,10 +42,13 @@ def get_logger(sname, file_name=None):
 
 
 def easy_date(line):
+    """
+    At the initial creation of this method, roughly 96% of the dates were 'easy' and well-formatted this way
+    """
     if pd.isna(line): return None
     if '/' not in line: return None
     if len(line.split('/')) != 3: return None
-    chunks = [chunk.strip() for chunk in line.split('/') 
+    chunks = [chunk.strip() for chunk in line.split('/')
               if (chunk.strip() not in ('', '0')) & (chunk.strip().isdigit())]
     if len(chunks) < 3: return None
     if (len(chunks[0]) > 2) | (len(chunks[1]) > 2) | (len(chunks[2]) % 2 != 0): return None
@@ -55,6 +59,11 @@ def easy_date(line):
 # there are two known allegation records from 2006 with a typo in the year
 # pdf_url: https://wayback.archive-it.org/org-571/20230120175459/https://sfgov.org/dpa/ftp/uploadedfiles/occ/OCC_05_06_openness.pdf
 def fix_oob_dates(df):
+    """
+    Fixes a specific OUT-OF-BOUNDS date value
+    - did it cause an issue with `pd.to_datetime()`?
+    - should this be deprecated in favor of just `drop_impossible()?`
+    """
     assert 'date_completed_text' in df.columns
     copy = df.copy()
     if any(copy.date_completed_text == '05/26/26'):
@@ -65,15 +74,122 @@ def fix_oob_dates(df):
     return copy
 
 
-def group_td(x):
-    if pd.isna(x): return None
-    if x < pd.to_timedelta(0, unit="s"): return "NEGATIVE"
-    elif x < pd.to_timedelta(30, unit="d"): return "Under 1 month"
-    elif x < pd.to_timedelta(90, unit="d"): return "Under 3 months"
-    elif x < pd.to_timedelta(180, unit="d"): return "Under 6 months"
-    elif x < pd.to_timedelta(365, unit="d"): return "Under 1 year"
-    elif x < pd.to_timedelta(365*2, unit="d"): return "Under 2 years"
-    else: return "Over 2 years"
+def format_datetimecols(df):
+    """
+    Formats `date_complained` and `date_completed` as Datetime objects.
+    """
+    copy = df.copy()
+    copy.rename(columns={'date_complained': 'date_complained_text',
+                         'date_completed': 'date_completed_text'}, inplace=True)
+    for field_text in ('date_complained_text', 'date_completed_text'):
+        field = field_text[:field_text.find('_text')]
+        copy[field_text] = copy[field_text].str.replace(' ', '')
+        copy = fix_oob_dates(copy)
+        # convert 'easy' vals to datetime
+        copy[field] = copy[field_text].apply(easy_date)
+        copy[field] = pd.to_datetime(copy[field],
+                                     dayfirst=False, yearfirst=False,
+                                     format="mixed")
+    return copy
+
+
+def drop_impossible(df, field):
+    """
+    Date values later than {today} are OUT-OF-BOUNDS and not possible as correct entries.
+    Convert OOB values to None.
+    """
+    copy = df.copy()
+    today = pd.to_datetime(time.strftime("%Y/%m/%d"))
+    copy.loc[copy[field] > today, field] = None
+    return copy
+
+
+def recover_complaintdates(df, field):
+    """
+    In the original reports, an entry for a given complaint uses the same
+    `date_complained` and `date_completed` for all pages about that complaint.
+    Therefore, these values can be borrowed from other pages to correct potential data entry errors.
+    Replace the field values for a given complain id with the value that occurs the most.
+    """
+    assert field in df.columns
+    copy = df.copy()
+    n_unique_byid = copy[['complaint_id', field]
+            ].groupby('complaint_id')[field].apply(lambda x: len(x.unique()))
+    fix_ids = n_unique_byid.loc[n_unique_byid > 1].index.values
+    print(f"correcting {len(fix_ids)} complaint_ids with broken {field} info")
+    for compid in fix_ids:
+        top_date = copy.loc[copy.complaint_id == compid, field].value_counts().head(1).index[0]
+        copy.loc[copy.complaint_id == compid, field] = top_date
+    copy['n_unique'] = copy[['complaint_id', field]
+        ].groupby('complaint_id')[field].apply(lambda x: len(x.unique()))
+    assert not (copy.n_unique > 1).any()
+    copy.drop(columns='n_unique', inplace=True)
+    return copy
+
+
+def verify_datecols(df):
+    logger.info('verifying formatted results')
+    assert df.date_complained.notna().sum() > (complaints.shape[0] / 2)
+    complain_rate = df.date_complained.notna().sum() / complaints.shape[0]
+    complete_rate = df.date_completed.notna().sum() / complaints.shape[0]
+    assert complain_rate >= .8 <= complete_rate
+    logger.info(f'conversion rate (date_complained):\t{complain_rate}')
+    logger.info(df.date_complained.describe())
+    logger.info(f'conversion rate (date_completed):\t{complete_rate}')
+    logger.info(df.date_completed.describe())
+    return 1
+
+
+def add_partial_datecols(df):
+    copy = df.copy()
+    copy['year_complained'] = copy.date_complained.dt.year
+    copy['month_complained'] = copy.date_complained.dt.month
+    copy['year_completed'] = copy.date_completed.dt.year
+    copy['month_completed'] = copy.date_completed.dt.month
+    return copy
+
+
+def recover_filedates(df):
+    """
+    Reports are completed and published once a month.
+    So, every report file should share a year and month completed.
+    """
+    copy = df.copy()
+    fileids = copy.fileid.unique()
+    for fileid in fileids:
+        topyear = copy.loc[copy.fileid == fileid, 'year_completed'].value_counts().head(1).index[0]
+        copy.loc[copy.fileid == fileid, 'year_completed'] = topyear
+        topmonth = copy.loc[copy.fileid == fileid, 'month_completed'].value_counts().head(1).index[0]
+        copy.loc[copy.fileid == fileid, 'month_completed'] = topmonth
+    return copy
+
+
+def find_cut_prefix(alleg):
+    """
+    The `allegations` field is derived from the 'SUMMARY OF ALLEGATIONS: ' line.
+    When a complaint includes more than 1 allegation, this line is prefixed with a number
+    that will add noise to otherwise identical allegations.
+    Additionally, some allegation summaries are actually very long,
+    though the full text remains available in the metadata field.
+
+    Note that this field is not the same as the `findings_of_fact` data which includes a
+    full description of the allegation by the complainant.
+    """
+    if pd.isna(alleg): return None
+    patt1 = "[0-9]+[" + re.escape(":- /") + "]+"
+    patt2 = "[0-9]+[a-z" + re.escape("-& ") + "]+" + "[0-9]+[" + re.escape(":- /") + "]+"
+    found2 = re.findall(patt2, alleg)
+    if any(found2):
+        for ea in found2: alleg = alleg.replace(ea, '')
+    else:
+        found1 = re.findall(patt1, alleg)
+        if any(found1):
+            for ea in found1: alleg = alleg.replace(ea, '')
+    if len(alleg) > 200:
+        alleg = alleg[:alleg.find("CATEGORY")]
+        if len(alleg) > 200: alleg = alleg[:200]
+    if pd.isna(alleg.strip()): return None
+    return alleg.strip()
 # }}}
 
 # main {{{
@@ -88,46 +204,17 @@ if __name__ == '__main__':
     complaints = pd.read_parquet(args.input)
     logger.info(f'read in {complaints.shape[0]} rows')
 
-    logger.info('prepping fields for formatting')
-    complaints.date_complained = complaints.date_complained.str.replace(' ', '')
-    complaints.date_completed = complaints.date_completed.str.replace(' ', '')
-    complaints.rename(columns={'date_complained': 'date_complained_text', \
-                               'date_completed': 'date_completed_text'}, inplace=True)
-    # remove illegal characters prior to exporting to excel
-    complaints = complaints.applymap(lambda x: ILLEGAL_CHARACTERS_RE.sub(r'', x) if isinstance(x, str) else x)
+    logger.info('cleaning and applying minor formatting')
+    complaints.allegations = complaints.allegations.apply(find_cut_prefix).replace("", None)
+    complaints = format_datetimecols(complaints)
+    datecols = ('date_complained', 'date_completed')
+    for datecol in datecols:
+        complaints = drop_impossible(df=complaints, field=datecol)
+        complaints = recover_complaintdates(df=complaints, field=datecol)
+    assert verify_datecols(complaints)
+    complaints = add_partial_datecols(df=complaints)
+    complaints = recover_filedates(df=complaints)
 
-    logger.info('fixing known typos with OUT-OF-BOUNDS dates')
-    complaints = fix_oob_dates(complaints)
-    # convert 'easy' vals to datetime 
-    logger.info('applying formatting')
-    complaints['date_complained'] = complaints.date_complained_text.apply(easy_date)
-    complaints.date_complained = pd.to_datetime(complaints.date_complained, 
-                                                     dayfirst=False, yearfirst=False, 
-                                                     format="mixed")
-    complaints['date_completed'] = complaints.date_completed_text.apply(easy_date)
-    complaints.date_completed = pd.to_datetime(complaints.date_completed, 
-                                                     dayfirst=False, yearfirst=False, 
-                                                     format="mixed")
-    
-    # during the initial creation of this method, roughly 96% of the dates were 'easy' and well-formatted this way
-    logger.info('verifying formatted results')
-    assert complaints.date_complained.notna().sum() > (complaints.shape[0] / 2)
-    complain_rate = complaints.date_complained.notna().sum() / complaints.shape[0]
-    complete_rate = complaints.date_completed.notna().sum() / complaints.shape[0]
-    logger.info(f'conversion rate (date_complained):\t{complain_rate}')
-    logger.info(complaints.date_complained.describe())
-    logger.info(f'conversion rate (date_completed):\t{complete_rate}')
-    logger.info(complaints.date_completed.describe())
-
-    logger.info('creating new fields `year_completed`, `time_to_complete`, `ttc_group`, etc')
-    complaints['mediated'] = complaints.finding == "M"
-    complaints['year_complained'] = complaints.date_complained.dt.year
-    complaints['year_completed'] = complaints.date_completed.dt.year
-    complaints['time_to_complete'] = complaints.date_completed - complaints.date_complained
-    complaints['ttc_group'] = complaints.time_to_complete.apply(group_td)
-    assert len(complaints.ttc_group.value_counts()) > 2
-    logger.info(complaints.ttc_group.value_counts())
-    
     logger.info(f'writing table with {complaints.shape[0]} rows, {complaints.shape[1]} columns')
     complaints.to_parquet(args.output)
 # }}}
