@@ -5,11 +5,14 @@
 # Copyright:   2023, HRDAG, GPL v2 or later
 # =========================================
 
-.PHONY: all export clean filter segment pdf2text scrape
+.PHONY: all export indicate clean filter segment pdf2text scrape
 
 all: export
 
-export: clean
+export: indicate
+	cd $@ && make
+
+indicate: clean
 	cd $@ && make
 
 clean: filter
