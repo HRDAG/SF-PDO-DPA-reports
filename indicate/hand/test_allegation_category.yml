@@ -1,0 +1,76 @@
+action_wo_cause:
+    - 'without cause'
+    - 'without justification'
+    - 'without reason'
+entry_wo_cause:
+    - 'enter[a-z ’\\-]* without cause'
+    - 'search[a-z ’\\-]* without justification'
+search_wo_cause:
+    - 'search[a-z ’\\-]* without cause'
+    - 'search[a-z ’\\-]* without justification'
+towed_wo_cause:
+    - ' tow[a-z ’]* without cause'
+    - ' tow[a-z ’]* without justification'
+tookproperty_wo_cause:
+    - ' seiz[a-z ’\\-]* without cause'
+    - ' seiz[a-z ’\\-]* without justification'
+cite_wo_cause:
+    - 'cit[a-z ]* without cause'
+    - 'cit[a-z ]* without justification'
+detain_wo_cause:
+    - 'detain[a-z ’\\-]* without cause'
+    - 'handcuff[a-z ’\\-]* without cause'
+    - 'detain[a-z ’\\-]* without justification'
+    - 'handcuff[a-z ’\\-]* without justification'
+    - 'detain[a-z ’\\-]* without reason'
+arrest_wo_cause:
+    - 'arrest[a-z ’\\-]* without cause'
+    - 'arrest[a-z ’\\-]* without justification'
+display_weapon:
+    - 'display[a-z ’\\-]* weapon without cause'
+    - 'display[a-z ’\\-]* weapon without justification'
+unnec_force:
+    - 'unnecessary force'
+    - 'excessive force'
+    - "damaged[a-z ’\\-]* property"
+    - 'tight handcuffs'
+    - 'improper[a-z ’\\-]* physical'
+dishonesty:
+    - 'misrepresented the truth'
+    - ' lied'
+    - ' lying'
+    - 'officer filed false charges'
+bias:
+    - 'bias'
+    - 'discriminat'
+    - 'selective enforcement'
+    - 'selectively enforced'
+inapp_action:
+    - 'inappropriate'
+    - 'unbecoming'
+    - 'invalid order'
+    - 'unwarranted action'
+    - 'misuse[a-z ]* authority'
+    - 'interfered with[a-z ]* rights[a-z ]* onlooker'
+    - 'drove improper'
+    - 'improper[a-z ]*search'
+    - 'profanity'
+    - 'profane'
+malignant_action:
+    - 'threaten'
+    - 'harass'
+    - 'intimidat'
+    - 'retaliatory behavior'
+    - 'retaliatory conduct'
+    - 'derogatory comment'
+    - 'slur'
+    - 'racially derogatory'
+    - 'drove[a-z ]* grossly negligent or reckle manner'
+    - 'drove[a-z ]* reck[a-z ]* manner'
+failed_reqmt:
+    - 'failed to'
+    - 'incomplete[a-z ]* report'
+    - 'inaccurate[a-z ]* report'
+    - 'incomplete[a-z ]* citation'
+    - 'inaccurate[a-z ]* citation'
+    - 'inattentive'
