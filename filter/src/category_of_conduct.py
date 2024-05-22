@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     # arg handling
     args = get_args()
-    
+
     logger.info('loading data')
     allegs = pd.read_parquet(args.input, \
                                  columns=['allegation_id', 'allegation_text', 'outside_jurisdiction'])
@@ -76,6 +76,6 @@ if __name__ == '__main__':
     allegs.drop(columns=['allegation_text', 'outside_jurisdiction'], inplace=True)
     allegs.to_parquet(args.output)
     logger.info("done.")
-    
+
 #}}}
 # done.
