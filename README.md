@@ -1,5 +1,7 @@
 # Complaints against SFPD Closed by the Department of Public Accountability
 
+[DPA report home](https://sf.gov/information/reports-policing-complaints)
+
 - the closed complaint data is publically available in the form of a monthly report (pdf)
 - the collection of monthly reports can be scraped from where they are posted on the current sf.gov website as well as the previous, archived version
 - the current sf.gov website contains reports for 2021 - present
