@@ -2,4 +2,5 @@
 !export/output
 **/.ipynb_checkpoints
 **/.log
-**checkpoint**
+**checkpoint
+**cache
