@@ -27,6 +27,7 @@ def get_args():
     parser.add_argument("--output", default="output/finding.parquet")
     args = parser.parse_args()
     assert Path(args.input).exists()
+    assert Path(args.hand).exists()
     return args
 
 

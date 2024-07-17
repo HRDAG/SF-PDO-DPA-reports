@@ -84,7 +84,7 @@ def make_proc_indic(df):
     copy = df.copy()
     copy['no_officer_id'] = copy.allegation_text.str.contains('unable to identify the officer', flags=re.I)
     copy['default_finding'] = copy.allegation_text.str.contains('insufficient evidence to prove or disprove', flags=re.I)
-    copy['withdrawn'] = (copy.allegation_text.str.contains('withdraw[a-z\s]+complaint', flags=re.I)) | (copy.finding.isin(("W", "NF/W")))
+    copy['withdrawn'] = (copy.allegation_text.str.contains('withdraw[a-z\\s]+complaint', flags=re.I)) | (copy.finding.isin(("W", "NF/W")))
     copy['intimidation'] = copy.allegation_text.str.contains('threatening, intimidating or harassing behavior', flags=re.I)
     copy['jlp'] = copy.allegation_text.str.contains('justified, lawful, and proper', flags=re.I)
     return copy
@@ -98,19 +98,18 @@ def make_kw_indic(df):
     copy.allegation_text.str.contains('biased policing', flags=re.I)
     copy['resisting'] = copy.allegation_text.str.contains('148') | \
     copy.allegation_text.str.contains('69') | \
-    copy.allegation_text.str.contains('resist[a-z\s]*arrest', flags=re.I)
+    copy.allegation_text.str.contains('resist[a-z\\s]*arrest', flags=re.I)
     copy['force'] = copy.allegation_text.str.contains('835', flags=re.I) | \
-    copy.allegation_text.str.contains('5[\.]*01', flags=re.I) | \
+    copy.allegation_text.str.contains('5[\\.]*01', flags=re.I) | \
     copy.allegation_text.str.contains('force', flags=re.I)
     copy['bwc'] = copy.allegation_text.str.contains(
     'bwc', flags=re.I) | copy.allegation_text.str.contains(
     'worn camera', flags=re.I)
     copy['pursuit'] = copy.allegation_text.str.contains('pursuit', flags=re.I)
     copy['swat'] = copy.allegation_text.str.contains('swat', flags=re.I)
-    copy['firearm'] = copy.allegation_text.str.contains( 'shotgun|handgun|rifle|firearm|\sgun', flags=re.I)
+    copy['firearm'] = copy.allegation_text.str.contains( 'shotgun|handgun|rifle|firearm|\\sgun', flags=re.I)
     copy['taser'] = copy.allegation_text.str.contains('taser|stungun', flags=re.I)
-    
-    copy['home'] = copy.allegation_text.str.contains("complainant's residence|complainant's home|entered[a-z\s']* home", flags=re.I)
+    copy['home'] = copy.allegation_text.str.contains("complainant's residence|complainant's home|entered[a-z\\s']* home", flags=re.I)
     copy['missing_person'] = copy.allegation_text.str.contains('missing person', flags=re.I)
     copy['minor'] = copy.allegation_text.str.contains("child|underage", flags=re.I)
     copy['crisis'] = copy.allegation_text.str.contains("health crisis", flags=re.I)
@@ -120,7 +119,7 @@ def make_kw_indic(df):
 def get_pages(line):
     if not line: return None
     if "page" not in line.lower(): return None
-    found = re.findall("page[\s#]*[0-9]+[a-z\s]*([0-9]+)", line, flags=re.I)
+    found = re.findall("page[\\s#]*[0-9]+[a-z\\s]*([0-9]+)", line, flags=re.I)
     if (not found) | (found == []): return None
     return found[0]
 #}}}

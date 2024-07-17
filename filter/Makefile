@@ -25,7 +25,7 @@ named_officers := output/named_officers.parquet
 
 all: $(first_pages) $(dates) $(complaints)
 
-clean: 
+clean:
 	-rm -r output/*
 # }}}
 
@@ -54,5 +54,5 @@ $(complaints): \
 		--ref=$(ref_table) \
 		--output=$@
 # }}}
- 
+
 # done.
