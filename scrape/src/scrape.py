@@ -102,7 +102,7 @@ def sort_links_by_year(links):
 
 # this function can be passed to `soup.find_all()` via the `href` arg
 # then it filters the soup for links matching the kw
-def openness_files(href, kw="openness"):
+def openness_files(href, kw="openness|CSR"):
     return href and re.compile(kw, flags=re.IGNORECASE).search(href)
 
 
