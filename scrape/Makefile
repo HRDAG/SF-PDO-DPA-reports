@@ -17,8 +17,8 @@ output := output/reference-table.parquet
 
 all: $(output)
 
-clean: 
-	-rm -r output/*
+clean:
+	-rm output/reference-table.parquet
 
 # }}}
 
@@ -31,5 +31,5 @@ $(output): \
 		--hand=$(users) \
 		--output=$@
 # }}}
- 
+
 # done.
