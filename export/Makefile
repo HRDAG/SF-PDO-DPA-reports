@@ -9,18 +9,23 @@
 # ---- dependencies {{{
 complaints := ../indicate/output/complaints.parquet
 output := output/complaints.xlsx
+useful := ../filter/output/useful.yml
 # }}}
 
 # ---- standard {{{
 .PHONY: clean all
 
-all: $(output)
+all: $(output) output/useful.done
 
 clean:
 	-rm -r output/*
 # }}}
 
 # ---- task-specific {{{
+output/useful.done: $(useful)
+	-cd output && ln -s ../$(useful) .
+	touch $@
+
 $(output): \
 		src/to_xlsx.py \
 		$(complaints)
