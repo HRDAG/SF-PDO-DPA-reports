@@ -1,32 +1,50 @@
 # currently unhandled but observed:
-# - NS, NF, ND, UFW, TOLL, D, CRD
+# - NS, NF, ND, UFW, TOLL, D, CRD, ICS
+
 Improper Conduct:
     - IC
-    - ICS
+    - Improper Conduct
+Improper Conduct (Sustained):
+    - IC/S
+    - IC(S)
+    - IC (Sustained)
+    - IC (SUSTAINED)
+    - IC/Sustained
+    - S/IC
+    - ICS/S
 Insufficient Evidence:
     - IE
+    - Insufficient Evidence
 Proper Conduct:
     - PC
+    - Proper Conduct
 Policy Failure:
     - PF
+    - Policy Failure
 Supervision Failure:
     - SF
+    - Supervision Failure
+Policy Failure; Training Failure:
+    - PF/TF
 Training Failure:
     - TF
+    - Training Failure
 Unfounded:
     - U
-No Finding:
-    - NF
+    - Unfounded
 Withdrawn:
     - W
-    - NFW
-    - NF/W
-    - Withdrawal
+    - Withdrawn
 Mediated:
     - M
+    - Mediated
 Sustained:
     - S
     - SUS
     - SUST
+    - (S)
+    - (Sustained)
 Referral:
     - Referral #NOTE: this field appears as "Referral/Agency", we'll want to catch the agency with a regex
+
+# done.
