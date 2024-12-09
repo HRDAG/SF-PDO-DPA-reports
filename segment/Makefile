@@ -12,7 +12,7 @@ pqs  := $(patsubst ../pdf2text/output/txt-test/%.txt,output/each/%.parquet,$(txt
 
 all: output/reference-table.parquet
 
-clean: 
+clean:
 	-rm -r output/*
 
 output/reference-table.parquet: src/ref-table.py $(pqs)
@@ -27,5 +27,5 @@ output/each/%.parquet: src/parse-sections.py ../pdf2text/output/txt-test/%.txt
 	python $< \
 		--input=../pdf2text/output/txt-test/$*.txt \
 		--output=$@
-	
+
 # done.

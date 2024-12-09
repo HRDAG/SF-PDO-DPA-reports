@@ -67,8 +67,8 @@ if __name__ == '__main__':
 
     # note: currently this would be better using `os.path.basename`,
     #       but keeping like this in case we ever have nested subdirs
-    ind['joincol']       = ind.pdf_file.str.extract('output/pdfs/(.+)\.pdf$')
-    segmented['joincol'] = segmented.parquetfile.str.extract('output/each/(.+)\.parquet$')
+    ind['joincol']       = ind.pdf_file.str.extract('output/pdfs/(.+)\\.pdf$')
+    segmented['joincol'] = segmented.parquetfile.str.extract('output/each/(.+)\\.parquet$')
 
     # note: there are duplicate files that get downloaded, but don't need to have
     # multiple rows since the files are different, we'll run them all through
