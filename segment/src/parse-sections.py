@@ -57,14 +57,13 @@ def update_states(curstate, line):
             'fact[:\\s\\(]*continued[:\\)]*'
         ])
         continuation = (pd.notna(re.match(patt, line, flags=re.I))) | ('continued' in line[:50].lower())
-        if continuation:
+        if (line.strip() == 'SUMMARY OF ALLEGATION #4: Continued)') & (
+            'DPA_04_20_openness' in str(curstate['txt_file'])):
+            return 1 # this line is uninformative and will be a false pos error in the audit
+        elif continuation:
             curstate['state'] = 'alleg_summary'
             curstate['allegation_buffer'] += (' ' + line)
-        elif (re.match('SUMMARY OF ALLEGATION #4: Continued\\)', line, flags=re.I)):
-            print("\n\n===== FOUND IT ====\n\n")
-            print('DPA_04_20_openness' in str(curstate['txt_file']))
-            return 1 # this line is uninformative and will be a false pos error in the audit
-        elif re.match('SUMMARY.+ALLEGATION[S]*:|SUMMARY.+ALLEGATION[S\\s#]*1[:\\-\\s]+',
+        elif re.match('SUMMARY.+ALLEGATION[S]*:|SUMMARY.+ALLEGATION[S\\s#]*1[:\\-\\s,]+',
                       line, flags=re.I):
             if re.match('SUMMARY.+ALLEGATION[S\\s]*#[2-9]+|SUMMARY.+ALLEGATION[S\\s]*#[0-9]{2,}',
                         line, flags=re.I):
@@ -127,7 +126,7 @@ def setup_audit(df):
     copy = df.copy()
     copy['continued_early'] = copy.allegation_text.apply(lambda x: 'continued' in x[:50].lower())
     copy['first_allegation'] = copy.allegation_text.str.contains(
-        'SUMMARY.+ALLEGATION[S]*:|SUMMARY.+ALLEGATION[S\\s#]*1[:\\-\\s]+', flags=re.I)
+        'SUMMARY.+ALLEGATION[S]*:|SUMMARY.+ALLEGATION[S\\s#]*1[:\\-\\s,]+', flags=re.I)
     copy['subseq_allegation'] = copy.allegation_text.str.contains(
         'SUMMARY.+ALLEGATION[S\\s]*#[2-9]+|SUMMARY.+ALLEGATION[S\\s]*#[0-9]{2,}', flags=re.I)
     copy.first_allegation = copy.first_allegation & ~copy.subseq_allegation
