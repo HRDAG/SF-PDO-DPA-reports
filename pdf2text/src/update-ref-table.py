@@ -46,6 +46,7 @@ def get_logger(sname, file_name=None):
 
 def guess_check_txt(filename):
     if pd.isna(filename): return None
+    if 'checkpoint' in filename: return None
     txtfile = filename.replace('pdfs', 'txt').replace('.pdf', '.txt')
     if not Path(txtfile).exists():
         if '.pdf.pdf' in filename:
