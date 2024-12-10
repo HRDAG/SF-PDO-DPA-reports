@@ -61,9 +61,16 @@ def find_date_completed(line):
 
 def find_mediation_info(line):
     if not line: return None
-    mediated = re.findall("(mediated\\s*[a-z0-9\\-,\\s/]*resolved.*$)", line, flags=re.I)
+    mediated = re.findall("mediated and resolved.*[\\.\\n]", line, flags=re.I)
     if not mediated: return None
-    return mediated
+    return "|".join(mediated).strip()
+
+
+def find_mediation_date(line):
+    if not line: return None
+    date = re.findall("([0-9]{2,4}\\/[0-9]{2,4}\\/[0-9]{2,4})|(\\w [0-9]{1,2}, [0-9]{4})", line, flags=re.I)
+    if not date: return None
+    return date
 #}}}
 
 # ---- main {{{
@@ -75,25 +82,21 @@ if __name__ == '__main__':
     args = get_args()
     logger.info('loading data')
     allegs = pd.read_parquet(args.input, columns=['allegation_id', 'complaint_meta', 'allegation_text'])
-    logger.info('adding DATE OF COMPLAINT as date_complained')
-    allegs['date_complained'] = allegs.complaint_meta.apply(
-        find_date_complained)
-    allegs.date_complained.sample(5)
-    logger.info('adding DATE OF COMPLETION as date_completed')
-    allegs['date_completed'] = allegs.complaint_meta.apply(
-        find_date_completed)
-    allegs.date_completed.sample(5)
-    logger.info('adding mediation info as mediation_status')
-    allegs['mediation_status'] = allegs.allegation_text.apply(
-        find_mediation_info)
-    allegs.mediation_status.sample(5)
+    logger.info('extracting DATE OF COMPLAINT as date_complained')
+    allegs['date_complained'] = allegs.complaint_meta.apply(find_date_complained)
+    logger.info('extracting DATE OF COMPLETION as date_completed')
+    allegs['date_completed'] = allegs.complaint_meta.apply(find_date_completed)
+    logger.info('extracting mediation info')
+    allegs['mediation_status'] = allegs.allegation_text.apply(find_mediation_info)
+    allegs['mediated'] = allegs.mediation_status.notna()
+    allegs['date_mediated'] = allegs.mediation_status.apply(find_mediation_date)
 
     miss_complain = allegs.date_complained.isna().sum()
     miss_complete = allegs.date_completed.isna().sum()
     logger.info(f'missing date_complained (count):\t{miss_complain}')
     logger.info(f'missing date_completed (count):\t{miss_complete}')
     assert allegs.date_complained.isna().sum() < (allegs.shape[0]*.5)
-    assert allegs.mediation_status.notna().sum() > 400
+    assert allegs.mediated.sum() > 900, f"{allegs.mediated.sum()} !> 900"
     allegs.drop(columns=['allegation_text', 'complaint_meta'], inplace=True)
     allegs.to_parquet(args.output)
     logger.info("done.")
