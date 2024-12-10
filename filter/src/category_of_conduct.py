@@ -14,6 +14,7 @@ from pathlib import Path
 from sys import stdout
 import argparse
 import logging
+import yaml
 import re
 import pandas as pd
 #}}}
@@ -22,9 +23,11 @@ import pandas as pd
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default="output/pages.parquet")
+    parser.add_argument("--hand", default="hand/category.yml")
     parser.add_argument("--output", default="output/conduct-category.parquet")
     args = parser.parse_args()
     assert Path(args.input).exists()
+    assert Path(args.hand).exists()
     return args
 
 
@@ -43,13 +46,29 @@ def get_logger(sname, file_name=None):
     return logger
 
 
+def readyaml(fname):
+    with open(fname, 'r') as f:
+        rules = yaml.safe_load(f)
+    return rules
+
+
 def find_cat(line):
     if not line: return None
     if "category of conduct" not in line.lower(): return None
-    found = re.findall("category of conduct\s*:([a-z\s]+)finding", line, flags=re.I)
+    found = re.findall("category of conduct\\s*:([a-z\\s]+)finding", line, flags=re.I)
     if (not found) | (found == []): return None
     if not found[0].strip(): return None
     return found[0].strip()
+
+
+def resolve_cat(x):
+    if not x: return None
+    found = []
+    for label, options in rules.items():
+        full = options + [label]
+        if x in full: found.append(label)
+    if not found: return f'Unknown category: {x}'
+    return "|".join(found)
 #}}}
 
 # ---- main {{{
@@ -59,21 +78,17 @@ if __name__ == '__main__':
 
     # arg handling
     args = get_args()
+    rules = readyaml(args.hand)
 
     logger.info('loading data')
     allegs = pd.read_parquet(args.input, \
-                                 columns=['allegation_id', 'allegation_text', 'outside_jurisdiction'])
+                                 columns=['allegation_id', 'allegation_text'])
     logger.info('adding CATEGORY OF CONDUCT as category_of_conduct')
     allegs['category_of_conduct'] = allegs.allegation_text.apply(find_cat)
-    allegs = allegs.explode('category_of_conduct')
-    lost_n = allegs.loc[(allegs.category_of_conduct.isna()) & \
-               (allegs.outside_jurisdiction==False) & \
-               (allegs.allegation_text.str.contains("category of conduct", regex=False, flags=re.I)), 'allegation_text'].shape[0]
-    logger.info(f"category label without value (count):\t{lost_n}")
-    #assert not any(allegs.loc[allegs.outside_jurisdiction==False].category_of_conduct.isna())
-    vc = allegs.category_of_conduct.fillna("MISSING").value_counts()
-    for k,v in vc.items(): logger.info('{}:{:>20}'.format(k, v))
-    allegs.drop(columns=['allegation_text', 'outside_jurisdiction'], inplace=True)
+    allegs['category_found'] = allegs.category_of_conduct.notna()
+    allegs['conduct_category'] = allegs.category_of_conduct.apply(resolve_cat)
+    assert not (allegs.category_found & allegs.conduct_category.isna()).any()
+    allegs.drop(columns=['allegation_text', 'category_of_conduct'], inplace=True)
     allegs.to_parquet(args.output)
     logger.info("done.")
 
