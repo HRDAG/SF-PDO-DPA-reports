@@ -45,12 +45,14 @@ def get_logger(sname, file_name=None):
 
 def find_allegs(line):
     if not line: return None
-    #if "page" not in line.lower(): return None
-    found = re.findall("summary[a-z\s]*allegation[s\s:#-]*([a-zA-Z0-9\s\W\D]+)category", 
+    if all([kw in line.lower() for kw in ('complaint date', 'completion date', 'page')]):
+        # line is metadata, not allegations
+        return None
+    found = re.findall("s[u]*mmary[a-z\\s]*allegation[s\\s:#-]*([a-zA-Z0-9\\s\\W\\D]+)category",
                        line, flags=re.I)
     if found: return found
-    if (not found) | (found == []): 
-        found = re.findall("summary\s[a-z\s@]*allegation[s\s:#-]*([a-zA-Z0-9\s\W\D]+)", 
+    if (not found) | (found == []):
+        found = re.findall("s[u]*mmary\\s[a-z\\s@]*allegation[s\\s:#-]*([a-zA-Z0-9\\s\\W\\D]+)",
                            line.replace("-", "@"), flags=re.I)
     return found
 #}}}
@@ -62,20 +64,22 @@ if __name__ == '__main__':
 
     # arg handling
     args = get_args()
-    
     logger.info('loading data')
-    complaints = pd.read_parquet(args.input, \
+    allegs = pd.read_parquet(args.input, \
                                  columns=['allegation_id', 'allegation_text'])
+    allegs = allegs.drop_duplicates().dropna(how='all')
     logger.info('adding SUMMARY OF ALLEGATION(S) as allegations')
-    complaints['allegations'] = complaints.allegation_text.apply(find_allegs)
-    complaints = complaints.explode('allegations')
-    assert not any(complaints.allegations.isna())
-    complaints.allegations.sample(5)
-    complaints.allegations = complaints.allegations.str.replace('@', '-', regex=False)
-    complaints.drop(columns='allegation_text', inplace=True)
-    complaints.to_parquet(args.output)
+    allegs['allegations'] = allegs.allegation_text.apply(find_allegs)
+    allegs = allegs.explode('allegations')
+    allegs = allegs.dropna(subset=['allegations'])
+    assert not any(allegs.allegations.isna()), f"\
+        {allegs.allegations.isna().sum()} rows missing `allegations`"
+    allegs.allegations.sample(5)
+    allegs.allegations = allegs.allegations.str.replace('@', '-', regex=False)
+    allegs.drop(columns='allegation_text', inplace=True)
+    allegs.to_parquet(args.output)
 
     logger.info("done.")
-    
+
 #}}}
 # done.
