@@ -97,7 +97,14 @@ def find_complaint_years(parsed, tagtype="div", classname="sfgov-section__conten
 # make initial links more organized
 # initial links can very in source / host platform, so this separation helps organizes the solution
 def sort_links_by_year(links):
-    return {link[link.find("20"):link.find("20")+4]: link for link in links}
+    """2025 link is picked up as a partial url missing domain, 
+    but other years still work as expected."""
+    links = {link[link.find("20"):link.find("20")+4]: link
+            for link in links}
+    domain = "https://www.sf.gov"
+    links = {year: link if ('sf.gov' in link) | ('wayback.archive-it.org' in link)
+             else f"{domain}{link}" for year, link in links.items()}
+    return links
 
 
 # this function can be passed to `soup.find_all()` via the `href` arg
@@ -161,7 +168,8 @@ def download_yearly_pdfs(yearly_pdfs, output_dir):
     for year, pdf_list in yearly_pdfs.items():
         print(f"attempting to download files from {year}")
         downloaded[year] = download_pdfs(pdf_list, output_dir)
-        assert downloaded[year]
+        # TODO: check again for 2025 reports; none posted as of 14-JAN-25
+        if year != '2025': assert downloaded[year]
     doc_data = [(url, filename) for year, file_status in downloaded.items()
                 for url, filename in file_status.items()]
     doc_df = pd.DataFrame(doc_data, columns=['pdf_url', 'pdf_file'])
@@ -190,7 +198,7 @@ if __name__ == '__main__':
 
     # read data, initial verification
     logger.info("Loading data.")
-
+    expected = [str(year) for year in range(2020, 2026, 1)]
     main_parsed = parse_link(args.url)
 
     # find_content() and find_complaint_years() take us from 1 home page link
@@ -200,7 +208,8 @@ if __name__ == '__main__':
     yearly_links = sort_links_by_year(yearly_links)
 
     # initial parsing of the links for complaint reports
-    years_parsed = {year: parse_link(link) for year, link in yearly_links.items()}
+    years_parsed = {year: parse_link(link)
+                    for year, link in yearly_links.items()}
 
     # since the 2020 link goes to the wayback page
     # and the wayback page just organizes the years (1998, 2021) by anchors
@@ -208,9 +217,10 @@ if __name__ == '__main__':
     yearly_pdf_links = {year: [tag["href"]
                                for tag in parsed.find_all(href=openness_files)]
                         for year, parsed in years_parsed.items()
-                        if year in ("2024", "2023", "2022", "2021", "2020")}
+                        if year in expected}
     yearly_pdf_links = {year:
-                        add_domain(parsed, domain="https://sf.gov") if year in ("2024", "2023", "2022", "2021")
+                        add_domain(parsed, domain="https://sf.gov")
+                        if year in ("2025", "2024", "2023", "2022", "2021")
                         else add_domain(parsed, domain="https://wayback.archive-it.org")
                         for year, parsed in yearly_pdf_links.items()}
     ref_table = download_yearly_pdfs(yearly_pdf_links, output_dir)
