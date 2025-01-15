@@ -47,7 +47,7 @@ def update_states(curstate, line):
         curstate['state'] = 'page_header'
     elif re.match('COMPLAINT SUMMARY REPORT', line.strip(), flags=re.I):
         curstate['state'] = 'page_header'
-    elif re.findall('(DATE OF COMPLAINT)|(DATE OF COMPLETION)', line.strip(), flags=re.I):
+    elif re.findall('(DATE OF COMPLAINT)|(COMPLAINT DATE)|(DATE OF COMPLETION)|(COMPLETION DATE)', line.strip(), flags=re.I):
         curstate['state'] = 'preallegation'
         curstate['complaintheaders'].add(line.strip())
     elif re.match('S[U]*MMARY.+ALLEGATION', line, flags=re.I):
