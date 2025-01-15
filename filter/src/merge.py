@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
     # arg handling
     args = get_args()
-    
+
     # load data
     base = pd.read_parquet(args.ref)
     allegations = pd.read_parquet(args.allegations)
@@ -140,30 +140,35 @@ if __name__ == '__main__':
     findings = pd.read_parquet(args.findings)
     findings_of_fact = pd.read_parquet(args.findings_of_fact)
     named_officers = pd.read_parquet(args.named_officers)
-    
+
     # need to merge page data to fields identified
-    l = pd.merge(base, dates, on="allegation_id", how="outer")
+    both = pd.merge(base, dates, on="allegation_id", how="inner")
     logger.info('base cols')
-    logger.info(l.columns)
-    for r in (allegations, category_of_conduct, 
+    logger.info(both.columns)
+    for r in (allegations, category_of_conduct,
               findings, findings_of_fact, named_officers):
         assert 'allegation_id' in r.columns
         logger.info('merging cols')
         logger.info(r.columns)
-        l = pd.merge(l, r, on="allegation_id", how='outer')
-        logger.info(l.columns)
-    assert 'date_completed' in l.columns
-    both = l.copy()
+        if all(['findings_of_fact' in df.columns for df in (both, r)]): print(both.columns, '\n\n', r.columns)
+        both = pd.merge(both, r, on="allegation_id", how='inner')
+        logger.info(both.columns)
+    assert 'date_completed' in both.columns
+
+    empty_block = 'SUMMARY[\\s\\-A-Z]*ALLEGATION[0-9S:#\\n\\s]*CATEGORY'
+    both.loc[both.allegation_text.str.contains(empty_block, flags=re.I), 'allegation_text'] = None
+    both = both.dropna(subset=['allegation_text'])
     both['n_complaint_pages'] = both.complaint_meta.apply(get_pages)
     both['complaint_id'] = both.fileid.astype(str) + '_' + both.complaint_no.astype(str)
-    
+
     logger.info('creating indicator variables')
     both = make_meta_indic(both)
     both = make_proc_indic(both)
     both = make_kw_indic(both)
     both.info()
+
     vc = both[[col for col in both.columns \
-               if both[col].dtype == bool]].sum().to_dict()   
+               if both[col].dtype == bool]].sum().to_dict()
     vc['reports_found'] = len(both.fileid.unique())
     vc['complaints'] = len(both.complaint_id.unique())
     vc['allegations'] = len(both.allegation_id.unique())
@@ -171,11 +176,11 @@ if __name__ == '__main__':
     vc['sustained'] = int(both.sustained.sum())
     vc['mediated'] = int(both.mediation_status.notna().sum())
     for v,c in vc.items(): logger.info(f'{v}:\t\t{c}')
+
     write_yaml("output/useful.yml", vc)
-    
     both.to_parquet(args.output)
-    
+
     logger.info("done.")
-    
+
 #}}}
 # done.

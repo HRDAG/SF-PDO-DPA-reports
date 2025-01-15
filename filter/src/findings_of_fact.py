@@ -45,15 +45,30 @@ def get_logger(sname, file_name=None):
 
 def find_facts(line):
     if not line: return None
-    if "fact" not in line.lower(): return None
-    found = re.findall("dept[.]*\saction:*\sfindings\sof\sfact:*\s*([a-zA-Z0-9\s\W\D]+)summary", line, flags=re.I)
+    if "find" not in line.lower(): return None
+    patts = ("dept[.]*\\saction:*\\sfindings\\sof\\sfact:*[\\s\\n]*([\\s\\n\\w\\d\\W\\D]+)summary",
+             "[\\s\\n]*findings\\sof\\sfact:*[\\s\\n]*([\\s\\n\\w\\d\\W\\D]+)summary",
+             'finding[soffact\\s]*:*[\\s\\n]*([\\s\\n\\w\\d\\W\\D]+)',
+            )
+    found = []
+    for patt in patts:
+        if not found: found = re.findall(patt, line, flags=re.I)
     if not found:
-        found = re.findall("\sfindings\sof\sfact:*\s*([a-zA-Z0-9\s\W\D]+)(?:summary|$)", line, flags=re.I)
-    if not found: 
-        found = [val[val.find('FINDINGS OF FACT: ') + 18:] 
-                 for val in line.split("SUMMARY OF ALLEGATION")[1:]]
-    if (not found) | (found == []): return None
+        found = [val[val.find('FINDING'):]
+                 for val in line.split("SUMMARY OF ALLEGATION")]
+    if not found:
+        if 'FINDING' in line: print(line[:100], '\n\n')
+        return None
     return found
+
+
+def format_findings(x):
+    if pd.isna(x): return None
+    depts = ('OFFICE OF CITIZEN COMPLAINTS', 'SAN FRANCISCO DEPARTMENT OF POLICE ACCOUNTABILITY')
+    for dept in depts:
+        chunks = x.split(dept)
+        return " ".join([chunk.strip() for chunk in chunks])
+    return x.strip()
 #}}}
 
 # ---- main {{{
@@ -63,19 +78,21 @@ if __name__ == '__main__':
 
     # arg handling
     args = get_args()
-    
+
     logger.info('loading data')
     allegs = pd.read_parquet(args.input, columns=['allegation_id', 'allegation_text'])
     logger.info('adding FINDINGS OF FACT as findings_of_fact')
     allegs['findings_of_fact'] = allegs.allegation_text.apply(find_facts)
     allegs = allegs.explode('findings_of_fact')
+    allegs.findings_of_fact = allegs.findings_of_fact.apply(format_findings)
     miss_n = allegs.findings_of_fact.isna().sum()
     logger.info(f'missing findings_of_fact (count):\t{miss_n}')
+    assert allegs.findings_of_fact.isna().sum() < 2500
     #assert not any(allegs.findings_of_fact.isna())
     allegs.drop(columns='allegation_text', inplace=True)
     allegs.to_parquet(args.output)
-    
+
     logger.info("done.")
-    
+
 #}}}
 # done.

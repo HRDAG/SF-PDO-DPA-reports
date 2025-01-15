@@ -44,7 +44,7 @@ def get_logger(sname, file_name=None):
 
 
 def find_officer_names(line):
-    pattern = re.compile("(OFFICER\s[A-Z]+\s[A-Z]+\s[#][0-9]{4,})", flags=re.I|re.M)
+    pattern = re.compile("(OFFICER\\s[A-Z]+\\s[A-Z]+\\s[#][0-9]{4,})", flags=re.I|re.M)
     found = re.findall(pattern, line)
     if (not found) | (found == []): return None
     return found
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     # arg handling
     args = get_args()
-    
+
     logger.info('loading data')
     allegs = pd.read_parquet(args.input, columns=['allegation_id', 'allegation_text'])
     logger.info('adding NAMED OFFICERS extraction as named_officers')
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     allegs.drop(columns='allegation_text', inplace=True)
     allegs.to_parquet(args.output)
     logger.info("done.")
-    
+
 #}}}
 
 # done.

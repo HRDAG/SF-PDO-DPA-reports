@@ -48,13 +48,16 @@ def find_allegs(line):
     if all([kw in line.lower() for kw in ('complaint date', 'completion date', 'page')]):
         # line is metadata, not allegations
         return None
-    found = re.findall("s[u]*mmary[a-z\\s]*allegation[s\\s:#-]*([a-zA-Z0-9\\s\\W\\D]+)category",
-                       line, flags=re.I)
-    if found: return found
-    if (not found) | (found == []):
-        found = re.findall("s[u]*mmary\\s[a-z\\s@]*allegation[s\\s:#-]*([a-zA-Z0-9\\s\\W\\D]+)",
-                           line.replace("-", "@"), flags=re.I)
-    return found
+    patts = ("s[u]*mmary[a-z\\s\\-]*allegation[s\\s:#-]*([a-zA-Z0-9\\s\\W\\D]+)category",
+             "s[u]*mmary\\s[a-z\\s@\\-]*allegation[s\\s:#-]*([a-zA-Z0-9\\s\\W\\D]+)category",
+             "s[u]*mmary[a-z\\s\\-]*allegation[s\\s:#-]*([a-zA-Z\\s\\n\\W\\D'\\(\\)\\.]+.*)category")
+    found = []
+    for patt in patts:
+        if not found: found = re.findall(patt, line, flags=re.I) # line.replace("-", "@")?
+    if not found: return None
+    narrowed = [item[:item.find('CATEGORY OF CONDUCT')] if 'CATEGORY OF CONDUCT' in item else item
+                for item in found]
+    return narrowed
 #}}}
 
 # ---- main {{{

@@ -50,13 +50,13 @@ def read_yaml(yaml_file):
     with open(yaml_file, 'r') as f:
         data = yaml.safe_load(f)
         f.close()
-    return data.split()
+    return data
 
 
 def find_outcomes(line):
     if not line: return None
     if "finding" not in line.lower(): return None
-    found = re.findall("finding:*([a-z/\)\(\s]*)dept|finding:*([a-z/\s\)\(]*)findings", 
+    found = re.findall("finding:*([a-z/\\)\\(\\s]*)dept|finding:*([a-z/\\s\\)\\(]*)findings",
                        line, flags=re.I)
     if not found: return None
     for (a,b) in found:
@@ -86,7 +86,6 @@ if __name__ == '__main__':
     logger.info('loading data')
     allegs = pd.read_parquet(args.input, columns=['allegation_id', 'allegation_text'])
     sustained_kws = read_yaml(args.hand)
-    print(sustained_kws)
     logger.info('adding FINDING as finding')
     allegs['finding'] = allegs.allegation_text.apply(find_outcomes)
     allegs = allegs.explode('finding')
