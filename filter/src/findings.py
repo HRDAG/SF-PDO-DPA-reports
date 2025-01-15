@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
     # arg handling
     args = get_args()
-    
+
     # TODO: there used to be a lot of nan filtering/handling/reporting here
     # but since the rewrite and not using explode here, that needs to happen elsewhere
     logger.info('loading data')
@@ -102,8 +102,8 @@ if __name__ == '__main__':
     for k,v in vc.items(): logger.info(f'{k}:\t{v}')
     allegs.drop(columns='allegation_text', inplace=True)
     allegs.to_parquet(args.output)
-    
+
     logger.info("done.")
-    
+
 #}}}
 # done.
