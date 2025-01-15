@@ -69,15 +69,16 @@ def apply_dpafindgroup(df, rules):
 
 
 def apply_dpacatgroup(df, rules):
+    assert 'conduct_category' in df.columns, f"`conduct_category` not found in {df.columns}"
     copy = df.copy()
-    copy.rename(columns={'category_of_conduct': 'category_of_conduct_original'}, inplace=True)
-    copy['category_of_conduct'] = copy.category_of_conduct_original
+    copy.rename(columns={'conduct_category': 'conduct_category_original'}, inplace=True)
+    copy['conduct_category'] = copy.conduct_category_original
     for label, catlist in rules.items():
         formcats = [cat.lower() for cat in catlist]
         copy.loc[(
-            copy.category_of_conduct.str.lower().isin(formcats)) | (
-            copy.category_of_conduct.str.lower() == label.lower()),
-        'category_of_conduct'] = label
+            copy.conduct_category.str.lower().isin(formcats)) | (
+            copy.conduct_category.str.lower() == label.lower()),
+        'conduct_category'] = label
     return copy
 
 
