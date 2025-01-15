@@ -62,7 +62,7 @@ def get_real_cols():
     'report_type', 'n_complaint_pages',\
     'dpa_added', 'occ_added',\
     'allegations', 'findings_of_fact',\
-    'category_of_conduct', 'finding', 'sustained', 'mediated', 'mediation_status', \
+    'conduct_category', 'finding', 'sustained', 'mediated', 'mediation_status', \
     'complaint_meta',\
     'allegation_text', \
     'pdf_url'
