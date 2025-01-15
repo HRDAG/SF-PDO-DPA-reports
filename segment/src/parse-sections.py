@@ -52,9 +52,9 @@ def update_states(curstate, line):
         curstate['complaintheaders'].add(line.strip())
     elif re.match('S[U]*MMARY.+ALLEGATION', line, flags=re.I):
         patt = "|".join([
-            'allegation[:\\s\\(]*continued[:\\)]*',
-            '[0-9]+[:\\s\\(]*continued[:\\)]*',
-            'fact[:\\s\\(]*continued[:\\)]*'
+            'allegation[:\\s\\(]*cont[inued\\.]+[:\\)]*',
+            '[0-9]+[:\\s\\(]*cont[inued\\.]+[:\\)]*',
+            'fact[:\\s\\(]*cont[inued\\.]+[:\\)]*'
         ])
         continuation = (pd.notna(re.match(patt, line, flags=re.I))) | ('continued' in line[:50].lower())
         if (line.strip() == 'SUMMARY OF ALLEGATION #4: Continued)') & (
