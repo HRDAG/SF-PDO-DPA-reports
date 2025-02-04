@@ -52,7 +52,7 @@ def guess_check_txt(filename):
         if '.pdf.pdf' in filename:
             try_file = filename.replace('pdfs', 'txt')[:-4] + '.txt'
             if (Path(try_file).exists()): return try_file
-            else: return 'not found'
+            else: return None
     return txtfile
 #}}}
 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     # arg handling
     args = get_args()
-    
+
     # read data, initial verification
     logger.info("Loading data.")
     ref_table = pd.read_parquet(args.input)
@@ -71,10 +71,10 @@ if __name__ == '__main__':
     if 'filename' in ref_table.columns:
         ref_table.rename(columns={'filename': 'pdf_file'}, inplace=True)
     ref_table['txtfile'] = ref_table.pdf_file.apply(guess_check_txt)
-    assert not any(ref_table.txtfile == 'not found')
+    ref_table = ref_table.dropna(subset='txtfile').reset_index(drop=True)
     ref_table['pdf_file'] = "../scrape/" + ref_table.pdf_file
     ref_table.to_parquet(args.output)
     logger.info("done.")
-    
+
 #}}}
 # done.

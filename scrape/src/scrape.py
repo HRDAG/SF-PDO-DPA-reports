@@ -76,12 +76,12 @@ def parse_link(url):
 
 # bc we want links, this by default only looks for that type attribute
 # flexible enough for the first few rounds of html sifting
-def find_content(parsed, tagtype, classname, kw):
+def find_content(parsed, classname, kw):
     # there are other sections on the page outside this scope
     if classname:
-        tags = parsed.find_all(tagtype, class_=classname)
+        tags = parsed.find_all(class_=classname)
     else:
-        tags = parsed.find_all(tagtype)
+        tags = parsed.find_all()
     if kw:
         return [link['href'] for tag in tags for link in tag.find_all("a")
                  if kw in tag.text.lower()]
@@ -90,14 +90,14 @@ def find_content(parsed, tagtype, classname, kw):
 
 # the initial links are separated by years but all appear under the same section name
 # the focus of this work is complaints so that is the default kw used to filter results
-def find_complaint_years(parsed, tagtype="div", classname="sfgov-section__content", kw="complaints"):
-    return find_content(parsed, tagtype, classname, kw)
+def find_complaint_years(parsed, classname="flex flex-col gap-y-12", kw="complaints"):
+    return find_content(parsed, classname, kw)
 
 
 # make initial links more organized
 # initial links can very in source / host platform, so this separation helps organizes the solution
 def sort_links_by_year(links):
-    """2025 link is picked up as a partial url missing domain, 
+    """2025 link is picked up as a partial url missing domain,
     but other years still work as expected."""
     links = {link[link.find("20"):link.find("20")+4]: link
             for link in links}
@@ -192,9 +192,6 @@ if __name__ == '__main__':
     args = get_args()
     output_dir = 'output/pdfs'
     users = read_yaml(args.hand)
-
-    print(users)
-    print(get_user_agent())
 
     # read data, initial verification
     logger.info("Loading data.")

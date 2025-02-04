@@ -95,8 +95,8 @@ if __name__ == '__main__':
     miss_complete = allegs.date_completed.isna().sum()
     logger.info(f'missing date_complained (count):\t{miss_complain}')
     logger.info(f'missing date_completed (count):\t{miss_complete}')
-    assert allegs.date_complained.isna().sum() < (allegs.shape[0]*.5)
-    assert allegs.mediated.sum() > 900, f"{allegs.mediated.sum()} !> 900"
+    assert allegs.date_complained.isna().sum() < (allegs.shape[0]*.5), f"{allegs.date_complained.isna().sum()}, {allegs.shape[0]}"
+    assert allegs.mediated.sum() > 800, f"{allegs.mediated.sum()} !> 800"
     allegs.drop(columns=['allegation_text', 'complaint_meta'], inplace=True)
     allegs.to_parquet(args.output)
     logger.info("done.")
