@@ -141,7 +141,7 @@ def download_pdfs(pdf_links, output_dir):
         # + we want to preserve the uploaded pdf's filename
         output_stub = f"{output_dir}"
         corrfname = f"{pdf_link[pdf_link.rfind('files/')+6:]}".replace("/", "-")
-        filename = f"{output_stub}/{corrfname}"
+        filename = f"{output_stub}/{corrfname}".replace(':--media.api.sf.gov-documents-', '')
         curr += 1
         try:
             print(f"\nattempting to download:\t{pdf_link}")
