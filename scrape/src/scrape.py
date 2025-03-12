@@ -216,7 +216,7 @@ if __name__ == '__main__':
                         for year, parsed in years_parsed.items()
                         if year in expected}
     yearly_pdf_links = {year:
-                        add_domain(parsed, domain="https://sf.gov")
+                        add_domain(parsed, domain="")
                         if year in ("2025", "2024", "2023", "2022", "2021")
                         else add_domain(parsed, domain="https://wayback.archive-it.org")
                         for year, parsed in yearly_pdf_links.items()}
