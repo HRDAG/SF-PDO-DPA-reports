@@ -61,6 +61,9 @@ def get_user_agent():
 
 # should play nice with any webpage we need step through
 def parse_link(url):
+    if "wayback.archive-it.org" in url:
+        print(f"skipping wayback archive link: {url}")
+        return BeautifulSoup("", "html.parser")
     # i had the "allow_redirects" arg set to False but it didnt work?
     res = requests.get(url, headers={
         "User-Agent" : get_user_agent()
@@ -116,6 +119,9 @@ def openness_files(href, kw="openness|CSR"):
 # assumes we want to download the full content without doing any filtering
 # p sure this would work for not-pdfs but that is the type of file we expect here
 def download_file(pdf_url, filename):
+    if 'wayback.archive-it.org' in pdf_url:
+        print(f"skipping wayback archive link: {pdf_url}")
+        return 0
     response = requests.get(pdf_url, headers={
         "User-Agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
 })
@@ -169,7 +175,7 @@ def download_yearly_pdfs(yearly_pdfs, output_dir):
         print(f"attempting to download files from {year}")
         downloaded[year] = download_pdfs(pdf_list, output_dir)
         # TODO: check again for 2025 reports; none posted as of 14-JAN-25
-        if year != '2025': assert downloaded[year]
+        if year > '2020': assert downloaded[year]
     doc_data = [(url, filename) for year, file_status in downloaded.items()
                 for url, filename in file_status.items()]
     doc_df = pd.DataFrame(doc_data, columns=['pdf_url', 'pdf_file'])
