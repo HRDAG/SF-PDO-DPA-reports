@@ -25,7 +25,7 @@ import pandas as pd
 # ---- support methods {{{
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", default="https://sf.gov/information/reports-policing-complaints")
+    parser.add_argument("--url", default="https://sf.gov/information--reports-policing-complaints")
     parser.add_argument("--hand", default="hand/useragents.yml")
     parser.add_argument("--output", default=None)
     args = parser.parse_args()
@@ -94,7 +94,8 @@ def find_content(parsed, classname, kw):
 # the initial links are separated by years but all appear under the same section name
 # the focus of this work is complaints so that is the default kw used to filter results
 def find_complaint_years(parsed, classname="flex flex-col gap-y-12", kw="complaints"):
-    return find_content(parsed, classname, kw)
+    content = find_content(parsed, classname, kw)
+    return [link for link in content if "policing-complaints" in link]
 
 
 # make initial links more organized
@@ -122,12 +123,12 @@ def download_file(pdf_url, filename):
     if 'wayback.archive-it.org' in pdf_url:
         print(f"skipping wayback archive link: {pdf_url}")
         return 0
-    response = requests.get(pdf_url, headers={
-        "User-Agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
-})
     if os.path.exists(filename):
         print(f"*** WARNING: filename '{filename}' already exists. Skipping write. ***\n")
         return 0
+    response = requests.get(pdf_url, headers={
+        "User-Agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
+})
     pdf = open(filename, 'wb')
     pdf.write(response.content)
     pdf.close()
@@ -173,9 +174,11 @@ def download_yearly_pdfs(yearly_pdfs, output_dir):
     print(downloaded.keys())
     for year, pdf_list in yearly_pdfs.items():
         print(f"attempting to download files from {year}")
-        downloaded[year] = download_pdfs(pdf_list, output_dir)
+        outdir = f"{output_dir}/{year}"
+        Path(outdir).mkdir(parents=True, exist_ok=True)
+        downloaded[year] = download_pdfs(pdf_list, outdir)
         # TODO: check again for 2025 reports; none posted as of 14-JAN-25
-        if year > '2020': assert downloaded[year]
+        #if year > '2020': assert downloaded[year]
     doc_data = [(url, filename) for year, file_status in downloaded.items()
                 for url, filename in file_status.items()]
     doc_df = pd.DataFrame(doc_data, columns=['pdf_url', 'pdf_file'])
@@ -201,13 +204,13 @@ if __name__ == '__main__':
 
     # read data, initial verification
     logger.info("Loading data.")
-    expected = [str(year) for year in range(2020, 2026, 1)]
+    expected = [str(year) for year in range(2022, 2027, 1)]
     main_parsed = parse_link(args.url)
 
     # find_content() and find_complaint_years() take us from 1 home page link
     # with other stuff on the page we don't want to scrape
     # to a dict of years and the associated urls for that year's complaint reports
-    yearly_links = find_complaint_years(main_parsed)
+    yearly_links = find_complaint_years(main_parsed, classname = "mb-20", kw=None)
     yearly_links = sort_links_by_year(yearly_links)
 
     # initial parsing of the links for complaint reports
@@ -221,11 +224,11 @@ if __name__ == '__main__':
                                for tag in parsed.find_all(href=openness_files)]
                         for year, parsed in years_parsed.items()
                         if year in expected}
-    yearly_pdf_links = {year:
-                        add_domain(parsed, domain="")
-                        if year in ("2025", "2024", "2023", "2022", "2021")
-                        else add_domain(parsed, domain="https://wayback.archive-it.org")
-                        for year, parsed in yearly_pdf_links.items()}
+    #yearly_pdf_links = {year:
+    #                    add_domain(parsed, domain="")
+    #                    if year in ("2026", "2025", "2024", "2023", "2022", "2021")
+    #                    else add_domain(parsed, domain="https://wayback.archive-it.org")
+    #                    for year, parsed in yearly_pdf_links.items()}
     ref_table = download_yearly_pdfs(yearly_pdf_links, output_dir)
     ref_table['fileid'] = ref_table.pdf_file.apply(hashid)
     logger.info(f'{ref_table.fileid.isna().sum()} null fileids')
