@@ -15,7 +15,7 @@ clean:
 	-rm -r output/*
 
 output/txt-test/%.txt: ../scrape/output/pdfs/%.pdf
-	-mkdir -p output/txt-test
+	-mkdir -p $(shell dirname $@)
 	pdftotext -layout $< $@
 
 $(output): \

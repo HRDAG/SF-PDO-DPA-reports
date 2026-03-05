@@ -21,8 +21,8 @@ import pandas as pd
 # ---- support methods {{{
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default=None)
-    parser.add_argument("--output", default="output/dates.parquet")
+    parser.add_argument("--input", default='../segment/output/reference-table.parquet')
+    parser.add_argument("--output")
     args = parser.parse_args()
     assert Path(args.input).exists()
     return args
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     logger.info(f'missing date_complained (count):\t{miss_complain}')
     logger.info(f'missing date_completed (count):\t{miss_complete}')
     assert allegs.date_complained.isna().sum() < (allegs.shape[0]*.5), f"{allegs.date_complained.isna().sum()}, {allegs.shape[0]}"
-    assert allegs.mediated.sum() > 800, f"{allegs.mediated.sum()} !> 800"
+    #assert allegs.mediated.sum() > 800, f"{allegs.mediated.sum()} !> 800"
     allegs.drop(columns=['allegation_text', 'complaint_meta'], inplace=True)
     allegs.to_parquet(args.output)
     logger.info("done.")

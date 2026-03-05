@@ -31,6 +31,7 @@ clean:
 
 # ---- task-specific {{{
 output/%.parquet: src/%.py $(ref_table)
+	mkdir -p $(dir $@)
 	python $< \
 		--input=$(ref_table) \
 		--output=$@
@@ -44,6 +45,7 @@ $(complaints): \
 		$(findings_of_fact) \
 		$(named_officers) \
 		$(ref_table)
+	mkdir -p $(dir $@)
 	python $< \
 		--allegations=$(allegations) \
 		--category_of_conduct=$(category_of_conduct) \

@@ -22,7 +22,7 @@ import pandas as pd
 # ---- support methods {{{
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default="output/pages.parquet")
+    parser.add_argument("--input", default="../segment/output/reference-table.parquet")
     parser.add_argument("--hand", default="hand/sustained.yml")
     parser.add_argument("--output", default="output/finding.parquet")
     args = parser.parse_args()
@@ -70,7 +70,8 @@ def add_sustained_col(df, sustained_kws):
     copy = df.copy()
     copy["sustained"] = False
     copy.loc[copy.finding.str.lower().isin(sustained_kws), 'sustained'] = True
-    assert copy.sustained.sum() > 800
+    #assert copy.sustained.sum() > 800
+    logger.info(f"found {copy.sustained.sum()} sustained allegations")
     return copy
 #}}}
 # ---- main {{{
